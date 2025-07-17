@@ -466,7 +466,7 @@
     let soundEnabled = true, leverReady = false, isNovaCutterReady = false;
     let streakScore = 0;
     let isPaused = false;
-    let audioCtx, audioUnlocked = false, audioBuffers = {};
+    let audioCtx, audioUnlocked = false, audioBuffers = {}, masterGainNode;
     let camera = { x: 0, y: 0 }, crosshairTarget = { x: 0, y: 0 };
     let dynamicPlayerSpeed;
     let speedIncreaseInterval = null;
@@ -474,6 +474,9 @@
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContext();
+        masterGainNode = audioCtx.createGain();
+        masterGainNode.gain.value = 0.40; // Master volume set to 40%
+        masterGainNode.connect(audioCtx.destination);
     } catch(e) {
         console.error("Web Audio API is not supported in this browser");
     }
@@ -720,7 +723,7 @@
         if (audioBuffers[type]) {
             const source = audioCtx.createBufferSource();
             source.buffer = audioBuffers[type];
-            source.connect(audioCtx.destination);
+            source.connect(masterGainNode);
             source.start(0);
             return;
         }
@@ -731,28 +734,28 @@
                 const o= audioCtx.createOscillator(), g = audioCtx.createGain();
                 o.type = 'square'; o.frequency.setValueAtTime(440, n); o.frequency.exponentialRampToValueAtTime(110, n + 0.15);
                 g.gain.setValueAtTime(0.4, n); g.gain.exponentialRampToValueAtTime(1e-3, n + 0.15);
-                o.connect(g); g.connect(audioCtx.destination); o.start(n); o.stop(n + 0.15);
+                o.connect(g); g.connect(masterGainNode); o.start(n); o.stop(n + 0.15);
                 break;
             }
             case 'damage': {
                 const o= audioCtx.createOscillator(), g = audioCtx.createGain();
                 o.type = 'sawtooth'; o.frequency.setValueAtTime(120, n); o.frequency.exponentialRampToValueAtTime(50, n + 0.2);
                 g.gain.setValueAtTime(0.5, n); g.gain.exponentialRampToValueAtTime(1e-3, n + 0.2);
-                o.connect(g); g.connect(audioCtx.destination); o.start(n); o.stop(n + 0.2);
+                o.connect(g); g.connect(masterGainNode); o.start(n); o.stop(n + 0.2);
                 break;
             }
             case 'powerup': case 'gameOver': {
                 const o= audioCtx.createOscillator(), g = audioCtx.createGain();
                 o.type = 'sawtooth'; g.gain.setValueAtTime(0.3, n); g.gain.exponentialRampToValueAtTime(0.01, n + 0.7);
                 o.frequency.setValueAtTime(type === 'powerup' ? 220 : 440, n); o.frequency.exponentialRampToValueAtTime(type === 'powerup' ? 880 : 110, n + 0.7);
-                o.connect(g); g.connect(audioCtx.destination); o.start(n); o.stop(n + 0.7);
+                o.connect(g); g.connect(masterGainNode); o.start(n); o.stop(n + 0.7);
                 break;
             }
             case 'ui_confirm': {
                 const o= audioCtx.createOscillator(), g = audioCtx.createGain();
                 o.type = 'sine'; o.frequency.setValueAtTime(523.25, n); o.frequency.exponentialRampToValueAtTime(783.99, n + 0.15);
                 g.gain.setValueAtTime(0.2, n); g.gain.exponentialRampToValueAtTime(1e-3, n + 0.15);
-                o.connect(g); g.connect(audioCtx.destination); o.start(n); o.stop(n + 0.2);
+                o.connect(g); g.connect(masterGainNode); o.start(n); o.stop(n + 0.2);
                 break;
             }
         }
