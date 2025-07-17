@@ -17,21 +17,27 @@
         }
        
         #game-container {
-            position: relative; background-color: #000; border: 5px solid #444;
-            box-shadow: inset 0 0 20px #000; overflow: hidden;
-            aspect-ratio: 4 / 3; width: auto; height: 100vh;
-            max-height: calc(100vw * 0.75);
+            position: relative;
+            background-color: #000;
+            border: 5px solid #444;
+            box-shadow: inset 0 0 20px #000;
+            aspect-ratio: 16 / 10;
+            width: 100vw;
+            height: auto;
+            max-height: 100vh;
+            max-width: calc(100vh * (16 / 10));
             cursor: none;
         }
-        @media(orientation: landscape) {
+
+        @media(orientation: portrait) {
             #game-container {
+                width: auto;
                 height: 100vh;
-                width: 100vw;
-                max-width: none;
-                max-height: none;
-                aspect-ratio: auto;
+                max-width: 100vw;
+                max-height: calc(100vw * (10/16));
             }
         }
+
 
         canvas {
             display: block; width: 100%; height: 100%;
@@ -49,52 +55,50 @@
        
         #cockpit-frame {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: 30px solid #282f67;
-            border-top-width: 80px;
-            border-bottom-width: 80px;
-            border-left-width: 100px;
-            border-right-width: 100px;
-            border-radius: 60px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            border-style: solid;
+            border-color: #282f67;
+            border-width: 40px 75px;
+            border-radius: 30px; box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
             z-index: 2; pointer-events: none;
         }
         #cockpit-frame::before, #cockpit-frame::after {
             content: ''; position: absolute; background: #202652;
-            width: 80px; height: 80px; box-shadow: inset 0 0 10px #000;
+            width: 40px; height: 40px; box-shadow: inset 0 0 8px #000;
         }
-        #cockpit-frame::before { top: -45px; left: -20px; transform: skewX(-45deg); }
-        #cockpit-frame::after { top: -45px; right: -20px; transform: skewX(45deg); }
+        #cockpit-frame::before { top: -25px; left: -10px; transform: skewX(-45deg); }
+        #cockpit-frame::after { top: -25px; right: -10px; transform: skewX(45deg); }
 
         #game-title-plate {
-            position: absolute; top: 25px; left: 50%;
+            position: absolute; top: 12px; left: 50%;
             transform: translateX(-50%);
-            font-size: 1.2em; color: #aaa;
-            background: #2a2a2a; border: 2px solid #111; padding: 5px 15px;
+            font-size: 1em; color: #aaa;
+            background: #2a2a2a; border: 2px solid #111; padding: 4px 12px;
             border-radius: 4px; letter-spacing: 2px;
             text-shadow: 1px 1px 0 #000; box-shadow: inset 0 1px 3px #000;
             z-index: 4;
         }
        
-        .dashboard { position: absolute; top: 80px; bottom: 80px; width: 70px; z-index: 3; }
-        #left-dashboard { left: 15px; display: flex; flex-direction: column; }
-        #right-dashboard { right: 15px; }
+        .dashboard { position: absolute; top: 40px; bottom: 40px; width: 65px; z-index: 3; }
+        #left-dashboard { left: 5px; display: flex; flex-direction: column; }
+        #right-dashboard { right: 5px; }
         .dash-light {
-            width: 15px; height: 15px; border-radius: 50%; background-color: #222; border: 2px solid #111; box-shadow: inset 0 0 5px rgba(0,0,0,0.7); margin: 10px auto;
+            width: 12px; height: 12px; border-radius: 50%; background-color: #222; border: 2px solid #111; box-shadow: inset 0 0 4px rgba(0,0,0,0.7); margin: 8px auto;
         }
         .dash-light.green {
-            background-color: #0f0; box-shadow: 0 0 8px #0f0; animation: pulse-green 2s infinite ease-in-out;
+            background-color: #0f0; box-shadow: 0 0 7px #0f0; animation: pulse-green 2s infinite ease-in-out;
         }
        
         #status-display {
-            background: #111; border: 3px solid #444; margin: 0 auto 10px auto; padding: 5px;
-            border-radius: 5px; box-shadow: inset 0 0 8px #000; text-align: center;
+            background: #111; border: 2px solid #444; margin: 0 auto 8px auto; padding: 4px;
+            border-radius: 4px; box-shadow: inset 0 0 6px #000; text-align: center;
         }
         #status-display span {
-            font-size: 8px; color: #ffff00; text-shadow: 1px 1px 0 #000;
+            font-size: 6px; color: #ffff00; text-shadow: 1px 1px 0 #000;
             display: block; margin-bottom: 2px;
         }
         .status-bar-container {
-            width: 100%; height: 12px; background: #1a1a1a; border: 2px solid #222;
-            border-radius: 3px; padding: 1px; margin-bottom: 5px;
+            width: 100%; height: 10px; background: #1a1a1a; border: 1px solid #222;
+            border-radius: 2px; padding: 1px; margin-bottom: 4px;
         }
         #shield-bar, #health-bar {
             width: 100%; height: 100%; border-radius: 1px;
@@ -104,55 +108,55 @@
         #health-bar { background: #00FF00; }
 
         .dashboard-button-container {
-            width: 60px; height: 40px; display: flex; justify-content: center; align-items: center;
+            width: 40px; height: 30px; display: flex; justify-content: center; align-items: center;
             margin: 0 auto; cursor: pointer;
         }
         #sound-toggle, #pause-button {
-            width: 30px; height: 30px;
+            width: 24px; height: 24px;
         }
 
         .powerup-screen {
-            width: 60px; height: 40px; background: #111; border: 3px solid #444;
-            margin: 5px auto; border-radius: 5px; box-shadow: inset 0 0 8px #000;
+            width: 50px; height: 35px; background: #111; border: 2px solid #444;
+            margin: 4px auto; border-radius: 4px; box-shadow: inset 0 0 6px #000;
             transition: all 0.3s ease; display: flex; justify-content: center;
-            align-items: center; font-size: 10px; color: rgba(255, 85, 85, 0);
+            align-items: center; font-size: 8px; color: rgba(255, 85, 85, 0);
             text-shadow: 1px 1px 0 #000;
         }
         #powerup-screen.ready {
             background: #500; border-color: #f33; color: #fff;
-            box-shadow: 0 0 15px #f00, inset 0 0 10px #f00;
+            box-shadow: 0 0 12px #f00, inset 0 0 8px #f00;
             animation: pulse-red-text 1.5s infinite ease-in-out;
         }
         #nova-powerup-screen.ready {
              background: #005; border-color: #33f; color: #fff;
-            box-shadow: 0 0 15px #00f, inset 0 0 10px #00f;
+            box-shadow: 0 0 12px #00f, inset 0 0 8px #00f;
             animation: pulse-blue-text 1.5s infinite ease-in-out;
         }
 
         .dash-lever-track {
-            width: 10px; height: 60px; background: #1a1a1a; border-radius: 5px; margin: 5px auto 10px auto; position: relative;
+            width: 8px; height: 50px; background: #1a1a1a; border-radius: 4px; margin: 4px auto 8px auto; position: relative;
         }
         .dash-lever {
-            position: absolute; left: -10px; bottom: 45px; width: 30px; height: 15px; border-radius: 3px; transition: bottom 0.3s ease;
+            position: absolute; left: -8px; bottom: 38px; width: 24px; height: 12px; border-radius: 2px; transition: bottom 0.3s ease;
         }
-        #dash-lever { background: #d92121; border-top: 3px solid #ff5555; }
-        #nova-lever { background: #2121d9; border-top: 3px solid #5555ff; }
+        #dash-lever { background: #d92121; border-top: 2px solid #ff5555; }
+        #nova-lever { background: #2121d9; border-top: 2px solid #5555ff; }
         #dash-lever.ready-to-pull { animation: pulse-red 1s infinite; cursor: pointer!important; }
         #nova-lever.ready-to-pull { animation: pulse-blue 1s infinite; cursor: pointer!important; }
-        .dash-lever.pulled { bottom: 5px; }
+        .dash-lever.pulled { bottom: 4px; }
        
         #decorative-buttons { margin-top: auto; }
-        .side-button-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px;}
-        .side-button { width: 12px; height: 12px; border-radius: 50%; background-color: #333; border: 2px solid #222; box-shadow: inset 0 1px 2px #000; }
+        .side-button-row { display: flex; justify-content: center; gap: 5px; margin-bottom: 6px;}
+        .side-button { width: 10px; height: 10px; border-radius: 50%; background-color: #333; border: 1px solid #222; box-shadow: inset 0 1px 2px #000; }
         .side-button.green { background: #080; animation: pulse-green 3s infinite alternate;}
         .side-button.blue { background: #008; animation: pulse-blue 2.5s infinite alternate-reverse;}
-        .switch-track { width: 15px; height: 30px; background-color: #1a1a1a; border-radius: 15px; border: 2px solid #111; position: relative; padding: 2px; }
-        .switch-toggle { width: 9px; height: 9px; border-radius: 50%; background: #666; position: absolute; top: 3px; left: 3px; }
+        .switch-track { width: 12px; height: 24px; background-color: #1a1a1a; border-radius: 12px; border: 1px solid #111; position: relative; padding: 2px; }
+        .switch-toggle { width: 8px; height: 8px; border-radius: 50%; background: #666; position: absolute; top: 2px; left: 2px; }
 
-        #radar-screen { margin: 15px auto 0 auto; position: relative; width: 70px; height: 70px; background: radial-gradient(circle, #020 10%, #050 70%); border-radius: 50%; border: 3px solid #0a0; box-shadow: inset 0 0 10px #000; overflow: hidden; }
+        #radar-screen { margin: 10px auto 0 auto; position: relative; width: 60px; height: 60px; background: radial-gradient(circle, #020 10%, #050 70%); border-radius: 50%; border: 2px solid #0a0; box-shadow: inset 0 0 8px #000; overflow: hidden; }
         #radar-sweep { width: 100%; height: 100%; background: linear-gradient(45deg, transparent 50%, rgba(50, 255, 50, 0.3) 50%); transform-origin: 50% 50%; animation: radar-sweep 3s linear infinite; }
         .radar-blip {
-            position: absolute; width: 4px; height: 4px; background: #afa; border-radius: 50%; animation: pulse 1s infinite;
+            position: absolute; width: 3px; height: 3px; background: #afa; border-radius: 50%; animation: pulse 1s infinite;
         }
 
         #scanlines-overlay {
@@ -173,14 +177,14 @@
         @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
         @keyframes radar-sweep { to { transform: rotate(360deg); } }
 
-        #ui-overlay { position: absolute; top: 20px; left: 20px; width: calc(100% - 40px); display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 4; padding: 0 80px; font-size: 1em; color: #FFFF00; text-shadow: 2px 2px 0 #000; }
+        #ui-overlay { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 4; padding: 0 50px; font-size: 0.8em; color: #FFFF00; text-shadow: 2px 2px 0 #000; }
         #score-container, #level-container { position: relative; padding: 0 5px; }
-        #score-container::before, #level-container::after { content: '['; position: absolute; left: -15px; }
-        #score-container::after, #level-container::before { content: ']'; position: absolute; right: -15px; }
+        #score-container::before, #level-container::after { content: '['; position: absolute; left: -10px; }
+        #score-container::after, #level-container::before { content: ']'; position: absolute; right: -10px; }
 
-        .powerup-status-text { position: absolute; top: 65px; left: 50%; transform: translateX(-50%); font-size: 1.2em; font-weight: bold; display: none; z-index: 4; text-align: center; text-shadow: 2px 2px 0 #000; }
+        .powerup-status-text { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); font-size: 1em; font-weight: bold; display: none; z-index: 4; text-align: center; text-shadow: 2px 2px 0 #000; }
         #powerup-status { color: #FFA500; }
-        #nova-powerup-status { color: #5555FF; top: 90px;}
+        #nova-powerup-status { color: #5555FF; top: 70px;}
 
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; z-index: 7; display: none; cursor: default; }
         .modal-content {
@@ -215,23 +219,24 @@
             display: none;
         }
        
-        #bottom-dashboard-decoration { position: absolute; bottom: 0; left: 100px; right: 100px; height: 75px; z-index: 3; pointer-events: none; padding: 10px 20px; display: flex; justify-content: space-between; align-items: flex-end; }
-        .deco-panel { display: flex; flex-direction: column; gap: 5px; }
-        .deco-light-strip { display: flex; gap: 3px; background-color: #111; padding: 4px; border-radius: 4px; border: 1px solid #000; }
-        .deco-light { width: 8px; height: 15px; background-color: #333; border-radius: 2px; box-shadow: inset 0 1px 1px #000; }
+        #bottom-dashboard-decoration { position: absolute; bottom: 0; left: 75px; right: 75px; height: 38px; z-index: 3; pointer-events: none; padding: 5px 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .deco-panel { display: flex; flex-direction: column; gap: 4px; }
+        .deco-light-strip { display: flex; gap: 2px; background-color: #111; padding: 3px; border-radius: 3px; border: 1px solid #000; }
+        .deco-light { width: 6px; height: 12px; background-color: #333; border-radius: 2px; box-shadow: inset 0 1px 1px #000; }
         .deco-light.yellow { background-color: #880; animation: flicker 0.2s infinite alternate; }
         .deco-light.red { background-color: #800; animation: pulse-red 2s infinite; }
-        .deco-button-group { display: flex; gap: 5px; margin-top: 5px; }
-        .deco-button { width: 20px; height: 20px; background-image: linear-gradient(to bottom, #444, #333); border: 2px solid #222; box-shadow: 0 2px 0 #111;}
+        .deco-button-group { display: flex; gap: 4px; margin-top: 4px; }
+        .deco-button { width: 16px; height: 16px; background-image: linear-gradient(to bottom, #444, #333); border: 1px solid #222; box-shadow: 0 2px 0 #111;}
         .deco-button.round { border-radius: 50%; }
-        .deco-button.square { border-radius: 4px; }
+        .deco-button.square { border-radius: 3px; }
         .deco-button.green-glow { background-image: linear-gradient(to bottom, #484, #363); animation: pulse-green 4s infinite;}
 
 
-        #controls-container { position: absolute; bottom: 20px; left: 0; width: 100%; display: none; justify-content: space-between; align-items: center; padding: 0 50px; z-index: 3; }
+        #controls-container { position: absolute; bottom: 20px; left: 0; width: 100%; display: none; justify-content: space-between; align-items: center; padding: 0 50px; z-index: 3; pointer-events: none; }
+        #joystick-container, #fireButton { pointer-events: auto; }
         #joystick-container { width: 120px; height: 120px; background-color: rgba(50, 50, 50, 0.5); border-radius: 50%; border: 4px solid #888; position: relative; display: flex; justify-content: center; align-items: center; }
         #joystick-knob { width: 60px; height: 60px; background: radial-gradient(circle, #999 0%, #666 100%); border: 3px solid #444; border-radius: 50%; position: absolute; cursor: grab; box-shadow: 0 4px 0 #333; }
-        #fireButton { width: 100px; height: 100px; background-color: #FF3333; color: white; font-size: 1.5em; font-weight: bold; border: 4px solid #fff; border-radius: 50%; cursor: pointer; user-select: none; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #CC0000; transition: all 0.05s ease; }
+        #fireButton { width: 100px; height: 100px; background-color: #FF3333; color: white; font-size: 1.5em; font-weight: bold; border: 4px solid #fff; border-radius: 50%; cursor: pointer; user-select: none; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #CC0000; transition: all 0.05s ease; display:flex; justify-content:center; align-items:center;}
         #fireButton:active { transform: translateY(4px); box-shadow: 0 2px 0 #CC0000; }
        
         #rotate-device-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 1000; justify-content: center; align-items: center; text-align: center; flex-direction: column; padding: 20px; }
@@ -239,24 +244,25 @@
         @media(hover: none) and (orientation: landscape) {
             #controls-container {
                 display: flex;
-                bottom: 3vh;
+                align-items: flex-end;
+                bottom: 2vh;
                 left: 3vw;
-                right: 105px; /* MODIFIED: Prevents fire button from overlapping the right dashboard */
+                right: 3vw;
                 width: auto;
                 padding: 0;
             }
             #joystick-container {
-                width: 20vmin;
-                height: 20vmin;
+                width: 22vmin;
+                height: 22vmin;
                 background-color: rgba(80, 80, 80, 0.5);
             }
             #joystick-knob {
-                width: 10vmin;
-                height: 10vmin;
+                width: 11vmin;
+                height: 11vmin;
             }
             #fireButton {
-                width: 18vmin;
-                height: 18vmin;
+                width: 20vmin;
+                height: 20vmin;
                 font-size: 2.5vmin;
                 background-color: rgba(255, 51, 51, 0.7);
             }
@@ -413,6 +419,7 @@
 
     <script>
     const canvas = document.getElementById('gameCanvas'), ctx = canvas.getContext('2d'), gameContainer = document.getElementById('game-container');
+    const cockpitFrameEl = document.getElementById('cockpit-frame');
     const crosshairEl = document.getElementById('crosshair'), radarBlipsContainer = document.getElementById('radar-blips-container');
     const scoreEl = document.getElementById('scoreEl'), levelEl = document.getElementById('levelEl'), finalScoreEl = document.getElementById('finalScoreEl');
     const powerupStatusEl = document.getElementById('powerup-status'), soundToggle = document.getElementById('sound-toggle');
@@ -523,6 +530,12 @@
    
     const PARALLAX_STRENGTH = 2.0;
     const CAMERA_EASING = 0.05;
+
+    // Cockpit dimensions for clamping crosshair
+    const COCKPIT_BORDER_TOP = 40;
+    const COCKPIT_BORDER_BOTTOM = 40;
+    const COCKPIT_BORDER_LEFT = 75;
+    const COCKPIT_BORDER_RIGHT = 75;
 
     const levels = [
         {name:"Space Debris", objective: "Clear the debris field!", e:[
@@ -985,9 +998,18 @@
     function handleAim(clientX, clientY) {
         if (isGameOver || isPaused || startScreen.style.display === 'flex' || howToPlayScreen.style.display === 'flex' || levelStartScreen.style.display === 'flex') return;
         const rect = canvas.getBoundingClientRect();
-        // Clamp crosshair position to within the canvas
-        crosshairTarget.x = Math.max(0, Math.min(clientX - rect.left, canvas.width));
-        crosshairTarget.y = Math.max(0, Math.min(clientY - rect.top, canvas.height));
+        
+        let relativeX = clientX - rect.left;
+        let relativeY = clientY - rect.top;
+
+        // Clamp crosshair position to within the cockpit frame
+        const minX = COCKPIT_BORDER_LEFT;
+        const maxX = canvas.width - COCKPIT_BORDER_RIGHT;
+        const minY = COCKPIT_BORDER_TOP;
+        const maxY = canvas.height - COCKPIT_BORDER_BOTTOM;
+
+        crosshairTarget.x = Math.max(minX, Math.min(relativeX, maxX));
+        crosshairTarget.y = Math.max(minY, Math.min(relativeY, maxY));
     }
     function handleJoystickMove(e) {
         e.preventDefault(); let touch = null;
@@ -1002,10 +1024,17 @@
         joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
 
         const gameRect = canvas.getBoundingClientRect();
-        const aimX = (gameRect.width / 2) + (dx / maxDist) * (gameRect.width / 2);
-        const aimY = (gameRect.height / 2) + (dy / maxDist) * (gameRect.height / 2);
-        crosshairTarget.x = aimX;
-        crosshairTarget.y = aimY;
+        let aimX = (gameRect.width / 2) + (dx / maxDist) * (gameRect.width / 2);
+        let aimY = (gameRect.height / 2) + (dy / maxDist) * (gameRect.height / 2);
+        
+        // Clamp to cockpit frame
+        const minX = COCKPIT_BORDER_LEFT;
+        const maxX = canvas.width - COCKPIT_BORDER_RIGHT;
+        const minY = COCKPIT_BORDER_TOP;
+        const maxY = canvas.height - COCKPIT_BORDER_BOTTOM;
+
+        crosshairTarget.x = Math.max(minX, Math.min(aimX, maxX));
+        crosshairTarget.y = Math.max(minY, Math.min(aimY, maxY));
     }
     function handleJoystickEnd(e) {
         if(joystickActiveId === null) return;
