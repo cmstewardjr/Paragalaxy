@@ -10,10 +10,15 @@
 
     <style>
         * {box-sizing: border-box; margin: 0; padding: 0;}
-        body {
+        html, body {
             background-color: #000; color: #fff; font-family: 'Press Start 2P', cursive;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden; image-rendering: pixelated;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            image-rendering: pixelated;
         }
        
         #game-container {
@@ -21,23 +26,9 @@
             background-color: #000;
             border: 5px solid #444;
             box-shadow: inset 0 0 20px #000;
-            aspect-ratio: 16 / 10;
-            width: 100vw;
-            height: auto;
-            max-height: 100vh;
-            max-width: calc(100vh * (16 / 10));
             cursor: none;
+            /* Sizing is handled by JavaScript to ensure it fits all viewports */
         }
-
-        @media(orientation: portrait) {
-            #game-container {
-                width: auto;
-                height: 100vh;
-                max-width: 100vw;
-                max-height: calc(100vw * (10/16));
-            }
-        }
-
 
         canvas {
             display: block; width: 100%; height: 100%;
@@ -138,6 +129,7 @@
         }
         .dash-lever {
             position: absolute; left: -8px; bottom: 38px; width: 24px; height: 12px; border-radius: 2px; transition: bottom 0.3s ease;
+            pointer-events: auto; /* Make sure levers are interactive */
         }
         #dash-lever { background: #d92121; border-top: 2px solid #ff5555; }
         #nova-lever { background: #2121d9; border-top: 2px solid #5555ff; }
@@ -177,7 +169,9 @@
         @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
         @keyframes radar-sweep { to { transform: rotate(360deg); } }
 
-        #ui-overlay { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 4; padding: 0 50px; font-size: 0.8em; color: #FFFF00; text-shadow: 2px 2px 0 #000; }
+        #ui-overlay { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 4; padding: 0 80px; font-size: 0.8em; color: #FFFF00; text-shadow: 2px 2px 0 #000; }
+        #score-container { margin-right: auto; padding-right: 20px;} /* Pushed to the left */
+        #level-container { margin-left: auto; padding-left: 20px; } /* Pushed to the right */
         #score-container, #level-container { position: relative; padding: 0 5px; }
         #score-container::before, #level-container::after { content: '['; position: absolute; left: -10px; }
         #score-container::after, #level-container::before { content: ']'; position: absolute; right: -10px; }
@@ -232,40 +226,65 @@
         .deco-button.green-glow { background-image: linear-gradient(to bottom, #484, #363); animation: pulse-green 4s infinite;}
 
 
-        #controls-container { position: absolute; bottom: 20px; left: 0; width: 100%; display: none; justify-content: space-between; align-items: center; padding: 0 50px; z-index: 3; pointer-events: none; }
+        #controls-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: space-between; align-items: flex-end; padding: 20px; z-index: 10; pointer-events: none; }
         #joystick-container, #fireButton { pointer-events: auto; }
         #joystick-container { width: 120px; height: 120px; background-color: rgba(50, 50, 50, 0.5); border-radius: 50%; border: 4px solid #888; position: relative; display: flex; justify-content: center; align-items: center; }
         #joystick-knob { width: 60px; height: 60px; background: radial-gradient(circle, #999 0%, #666 100%); border: 3px solid #444; border-radius: 50%; position: absolute; cursor: grab; box-shadow: 0 4px 0 #333; }
-        #fireButton { width: 100px; height: 100px; background-color: #FF3333; color: white; font-size: 1.5em; font-weight: bold; border: 4px solid #fff; border-radius: 50%; cursor: pointer; user-select: none; text-shadow: 2px 2px 0 #000; box-shadow: 0 6px 0 #CC0000; transition: all 0.05s ease; display:flex; justify-content:center; align-items:center;}
-        #fireButton:active { transform: translateY(4px); box-shadow: 0 2px 0 #CC0000; }
+        
+        #fireButton {
+            width: 100px;
+            height: 100px;
+            background-image: radial-gradient(circle, #f54e4e 0%, #d11a2a 100%);
+            color: white;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            user-select: none;
+            text-shadow: 2px 2px 0 #880814;
+            box-shadow: 0 6px 0 #a0101d, inset 0 2px 3px rgba(255,255,255,0.4);
+            transition: all 0.05s ease;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        #fireButton:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #a0101d, inset 0 2px 3px rgba(255,255,255,0.4);
+        }
        
-        #rotate-device-screen { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #000; z-index: 1000; justify-content: center; align-items: center; text-align: center; flex-direction: column; padding: 20px; }
+        #rotate-device-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: #000; /* MODIFIED: Set to solid black */
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            padding: 20px;
+            color: #fff;
+            text-shadow: 0 0 8px #fff;
+        }
+        
+        /* NEW */
+        #rotate-screen-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place behind the text */
+        }
         
         @media(hover: none) and (orientation: landscape) {
-            #controls-container {
-                display: flex;
-                align-items: flex-end;
-                bottom: 2vh;
-                left: 3vw;
-                right: 3vw;
-                width: auto;
-                padding: 0;
-            }
-            #joystick-container {
-                width: 22vmin;
-                height: 22vmin;
-                background-color: rgba(80, 80, 80, 0.5);
-            }
-            #joystick-knob {
-                width: 11vmin;
-                height: 11vmin;
-            }
-            #fireButton {
-                width: 20vmin;
-                height: 20vmin;
-                font-size: 2.5vmin;
-                background-color: rgba(255, 51, 51, 0.7);
-            }
+            #controls-container { display: flex; }
+            #joystick-container { width: 22vmin; height: 22vmin; }
+            #joystick-knob { width: 11vmin; height: 11vmin; }
+            #fireButton { width: 20vmin; height: 20vmin; font-size: 2.5vmin; }
         }
         @media(hover: none) and (orientation: portrait) {
             #rotate-device-screen { display: flex; }
@@ -273,7 +292,10 @@
     </style>
 </head>
 <body>
-    <div id="rotate-device-screen"><p>Please rotate your device</p></div>
+    <div id="rotate-device-screen">
+        <canvas id="rotate-screen-canvas"></canvas>
+        <p>Please rotate your device</p>
+    </div>
 
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
@@ -414,7 +436,7 @@
 
     <div id="controls-container">
         <div id="joystick-container"><div id="joystick-knob"></div></div>
-        <button id="fireButton">FIRE</button>
+        <button id="fireButton">SHOOT</button>
     </div>
 
     <script>
@@ -433,6 +455,7 @@
     const healthBarEl = document.getElementById('health-bar'), shieldBarEl = document.getElementById('shield-bar');
     const highScoreNoticeEl = document.getElementById('high-score-notice');
     const pauseButton = document.getElementById('pause-button'), pauseScreen = document.getElementById('pauseScreen'), resumeButton = document.getElementById('resumeButton');
+    const rotateDeviceScreen = document.getElementById('rotate-device-screen');
 
     const soundOnIcon=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFFF00"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
     const soundOffIcon=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#888"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>`;
@@ -507,9 +530,21 @@
     let streakScore = 0;
     let isPaused = false;
     let audioCtx, audioUnlocked = false, audioBuffers = {}, masterGainNode;
-    let camera = { x: 0, y: 0 }, crosshairTarget = { x: 0, y: 0 };
+    let camera = { x: 0, y: 0 };
+    let crosshairPos = { x: 0, y: 0 }; // Current position
+    let crosshairTarget = { x: 0, y: 0 }; // Target position (from mouse or joystick)
+    let joystickTargetPos = { x: 0, y: 0, active: false};
+    const JOYSTICK_EASING = 0.25; // Slower, smoother joystick movement
+
     let dynamicPlayerSpeed;
     let speedIncreaseInterval = null;
+    
+    // NEW: Variables for rotate screen animation
+    let rotateScreenCanvas, rotateScreenCtx, rotateScreenStars = [], rotateScreenShootingStars = [];
+    let rotateScreenAnimationId = null;
+    const ROTATE_STAR_COUNT = 300;
+    const ROTATE_SHOOTING_STAR_COUNT = 5;
+
 
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -521,21 +556,22 @@
         console.error("Web Audio API is not supported in this browser");
     }
 
-    const BASE_PLAYER_SPEED = 5;
-    const FOCAL_LENGTH = 400, MAX_DEPTH = 1000, STAR_COUNT = 400;
+    const BASE_PLAYER_SPEED = 8.0;
+    const FOCAL_LENGTH = 400, MAX_DEPTH = 1000, STAR_COUNT = 450;
     const POWERUP_DURATION = 15000, NOVA_CUTTER_DURATION = 10000;
-    const LEVER_SCORE_INTERVAL = 400, NOVA_LEVER_SCORE_STREAK = 500;
+    const LEVER_SCORE_INTERVAL = 550; // MODIFIED: Point requirement for Double Blaster
+    const NOVA_LEVER_SCORE_STREAK = 900; // MODIFIED: Streak requirement for Nova Cutter
     const PLAYER_MAX_HEALTH = 15, PLAYER_MAX_SHIELD = 10;
-    const MIN_STAR_RADIUS = 0.5; const MAX_STAR_RADIUS = 2.5; const MIN_ENEMY_DRAW_SIZE = 4;
+    const MIN_STAR_RADIUS = 0.5; const MAX_STAR_RADIUS = 2.5; const MIN_ENEMY_DRAW_SIZE = 3;
    
     const PARALLAX_STRENGTH = 2.0;
     const CAMERA_EASING = 0.05;
 
     // Cockpit dimensions for clamping crosshair
-    const COCKPIT_BORDER_TOP = 40;
-    const COCKPIT_BORDER_BOTTOM = 40;
-    const COCKPIT_BORDER_LEFT = 75;
-    const COCKPIT_BORDER_RIGHT = 75;
+    const COCKPIT_BORDER_TOP = 35;
+    const COCKPIT_BORDER_BOTTOM = 35;
+    const COCKPIT_BORDER_LEFT = 70;
+    const COCKPIT_BORDER_RIGHT = 70;
 
     const levels = [
         {name:"Space Debris", objective: "Clear the debris field!", e:[
@@ -721,7 +757,7 @@
     }
 
     async function init() {
-        setCanvasSize();
+        resizeGame();
         startScreenText.textContent = "Loading assets...";
         mainStartButton.disabled = true; howToPlayButton.disabled = true; highScoreNoticeEl.style.display = 'none';
         startScreen.style.display = 'flex';
@@ -804,6 +840,45 @@
                 o.connect(g); g.connect(masterGainNode); o.start(n); o.stop(n + 0.2);
                 break;
             }
+            case 'lever_ready_1': { // Ascending arpeggio for Double Blaster
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.connect(g);
+                g.connect(masterGainNode);
+                const scheduleNote = (freq, startTime, duration) => {
+                    o.frequency.setValueAtTime(freq, startTime);
+                    g.gain.setValueAtTime(0.2, startTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                };
+                let time = n;
+                scheduleNote(261.63, time, 0.2); time += 0.2; // C4
+                scheduleNote(329.63, time, 0.2); time += 0.2; // E4
+                scheduleNote(392.00, time, 0.2); time += 0.2; // G4
+                scheduleNote(523.25, time, 0.6);             // C5
+                o.start(n);
+                o.stop(n + 2.5);
+                break;
+            }
+            case 'lever_ready_2': { // More "serious" arpeggio for Nova Cutter
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = 'sawtooth';
+                o.connect(g);
+                g.connect(masterGainNode);
+                const scheduleNote = (freq, startTime, duration) => {
+                    o.frequency.setValueAtTime(freq, startTime);
+                    g.gain.setValueAtTime(0.2, startTime);
+                    g.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                };
+                let time = n;
+                scheduleNote(220.00, time, 0.15); time += 0.15; // A3
+                scheduleNote(261.63, time, 0.15); time += 0.15; // C4
+                scheduleNote(329.63, time, 0.15); time += 0.15; // E4
+                scheduleNote(440.00, time, 0.5);  time += 0.5;  // A4
+                scheduleNote(329.63, time, 0.8);               // E4
+                o.start(n);
+                o.stop(n + 2.5);
+                break;
+            }
         }
     }
 
@@ -826,12 +901,23 @@
         playSound('ui_confirm');
         levelStartScreen.style.display = 'none';
         isGameOver = false;
-        spawnEnemies();
-        if (!gameLoopId) animate();
 
-        speedIncreaseInterval = setInterval(() => {
-            if (!isPaused) dynamicPlayerSpeed += 0.75;
-        }, 15000);
+        // Survival Mode special conditions
+        if (currentLevel === 4) {
+            dynamicPlayerSpeed = BASE_PLAYER_SPEED * 1.5; // Faster initial speed
+        }
+
+        spawnEnemies();
+        if (gameLoopId) cancelAnimationFrame(gameLoopId);
+        if (menuLoopId) cancelAnimationFrame(menuLoopId);
+        menuLoopId = null;
+        animate();
+
+        if (currentLevel !== 4) { // No gradual speed increase in survival
+            speedIncreaseInterval = setInterval(() => {
+                if (!isPaused) dynamicPlayerSpeed += 0.75;
+            }, 15000);
+        }
     }
 
     function spawnEnemies() {
@@ -866,22 +952,34 @@
         ctx.globalAlpha = 1;
     }
    
+    let menuLoopId = null;
     function animateMenuBackground() {
-        if(isGameOver || levelStartScreen.style.display === 'flex' || startScreen.style.display === 'none') { if(gameLoopId) cancelAnimationFrame(gameLoopId); gameLoopId = null; return; }
-        gameLoopId = requestAnimationFrame(animateMenuBackground);
-        ctx.clearRect(0, 0, canvas.width, canvas.height); drawStars();
+        const isGameRunning = !isGameOver && startScreen.style.display === 'none' && levelStartScreen.style.display === 'none' && howToPlayScreen.style.display === 'none' && !isPaused;
+        if(isGameRunning) {
+            if(menuLoopId) cancelAnimationFrame(menuLoopId);
+            menuLoopId = null;
+            return;
+        }
+        menuLoopId = requestAnimationFrame(animateMenuBackground);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawStars();
     }
+
 
     function animate() {
         gameLoopId = requestAnimationFrame(animate);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Smoothly move crosshair towards its target position
+        crosshairPos.x += (crosshairTarget.x - crosshairPos.x) * JOYSTICK_EASING;
+        crosshairPos.y += (crosshairTarget.y - crosshairPos.y) * JOYSTICK_EASING;
        
-        crosshairEl.style.left = `${crosshairTarget.x}px`;
-        crosshairEl.style.top = `${crosshairTarget.y}px`;
+        crosshairEl.style.left = `${crosshairPos.x}px`;
+        crosshairEl.style.top = `${crosshairPos.y}px`;
 
         if (canvas.width > 0) {
-            const targetCamX = (crosshairTarget.x - canvas.width / 2) * PARALLAX_STRENGTH;
-            const targetCamY = (crosshairTarget.y - canvas.height / 2) * PARALLAX_STRENGTH;
+            const targetCamX = (crosshairPos.x - canvas.width / 2) * PARALLAX_STRENGTH;
+            const targetCamY = (crosshairPos.y - canvas.height / 2) * PARALLAX_STRENGTH;
             camera.x += (targetCamX - camera.x) * CAMERA_EASING;
             camera.y += (targetCamY - camera.y) * CAMERA_EASING;
         }
@@ -934,9 +1032,12 @@
                         if (!player.isDoubleBlasterActive) leverProgressScore += enemy.points;
                         updateUI();
                         enemies.splice(eIndex, 1);
+                        
+                        const requiredLeverScore = currentLevel === 4 ? 300 : LEVER_SCORE_INTERVAL;
+                        const requiredNovaScore = currentLevel === 4 ? 600 : NOVA_LEVER_SCORE_STREAK;
 
-                        if (!leverReady && leverProgressScore >= LEVER_SCORE_INTERVAL) makeLeverReady();
-                        if (!isNovaCutterReady && streakScore >= NOVA_LEVER_SCORE_STREAK) makeNovaLeverReady();
+                        if (!leverReady && leverProgressScore >= requiredLeverScore) makeLeverReady(requiredLeverScore);
+                        if (!isNovaCutterReady && streakScore >= requiredNovaScore) makeNovaLeverReady();
                     }
                     break;
                 }
@@ -962,11 +1063,11 @@
         updateRadar();
     }
 
-    function makeLeverReady() { leverReady = true; leverProgressScore -= LEVER_SCORE_INTERVAL; dashLeverEl.classList.add('ready-to-pull'); dashLeverEl.style.cursor = 'pointer'; powerupScreenEl.classList.add('ready'); powerupScreenEl.textContent = 'PULL'; dashLeverEl.addEventListener('click', pullLever); }
-    function pullLever() { if (!leverReady) return; leverReady = false; dashLeverEl.classList.remove('ready-to-pull'); dashLeverEl.classList.add('pulled'); dashLeverEl.style.cursor = 'default'; powerupScreenEl.classList.remove('ready'); player.activateDoubleBlaster(); dashLeverEl.removeEventListener('click', pullLever); }
+    function makeLeverReady(scoreToSubtract) { playSound('lever_ready_1'); leverReady = true; leverProgressScore -= scoreToSubtract; dashLeverEl.classList.add('ready-to-pull'); dashLeverEl.style.cursor = 'pointer'; powerupScreenEl.classList.add('ready'); powerupScreenEl.textContent = 'CLICK'; dashLeverEl.addEventListener('click', pullLever); dashLeverEl.addEventListener('touchstart', pullLever, { passive: false }); }
+    function pullLever(e) { e.preventDefault(); e.stopPropagation(); if (!leverReady) return; leverReady = false; dashLeverEl.classList.remove('ready-to-pull'); dashLeverEl.classList.add('pulled'); dashLeverEl.style.cursor = 'default'; powerupScreenEl.classList.remove('ready'); player.activateDoubleBlaster(); dashLeverEl.removeEventListener('click', pullLever); dashLeverEl.removeEventListener('touchstart', pullLever); }
    
-    function makeNovaLeverReady() { isNovaCutterReady = true; novaLeverEl.classList.add('ready-to-pull'); novaLeverEl.style.cursor = 'pointer'; novaPowerupScreenEl.classList.add('ready'); novaPowerupScreenEl.textContent = 'PULL'; novaLeverEl.addEventListener('click', pullNovaLever); }
-    function pullNovaLever() { if (!isNovaCutterReady) return; isNovaCutterReady = false; streakScore = 0; novaLeverEl.classList.remove('ready-to-pull'); novaLeverEl.classList.add('pulled'); novaLeverEl.style.cursor = 'default'; novaPowerupScreenEl.classList.remove('ready'); player.activateNovaCutter(); novaLeverEl.removeEventListener('click', pullNovaLever); }
+    function makeNovaLeverReady() { playSound('lever_ready_2'); isNovaCutterReady = true; novaLeverEl.classList.add('ready-to-pull'); novaLeverEl.style.cursor = 'pointer'; novaPowerupScreenEl.classList.add('ready'); novaPowerupScreenEl.textContent = 'CLICK'; novaLeverEl.addEventListener('click', pullNovaLever); novaLeverEl.addEventListener('touchstart', pullNovaLever, { passive: false }); }
+    function pullNovaLever(e) { e.preventDefault(); e.stopPropagation(); if (!isNovaCutterReady) return; isNovaCutterReady = false; streakScore = 0; novaLeverEl.classList.remove('ready-to-pull'); novaLeverEl.classList.add('pulled'); novaLeverEl.style.cursor = 'default'; novaPowerupScreenEl.classList.remove('ready'); player.activateNovaCutter(); novaLeverEl.removeEventListener('click', pullNovaLever); novaLeverEl.removeEventListener('touchstart', pullNovaLever); }
 
     function endGame(isWin) {
         isGameOver = true;
@@ -981,6 +1082,7 @@
         else { highScoreNoticeEl.style.display = 'none'; }
         gameOverTitle.textContent = isWin ? "VICTORY!" : "GAME OVER"; gameOverScreen.style.display = 'flex';
         playSound(isWin ? 'powerup' : 'gameOver');
+        animateMenuBackground();
     }
     function updateUI() {
         if (!scoreEl || !player) return;
@@ -993,10 +1095,86 @@
     }
     function updateRadar() { if (Math.random() < 0.1) { if (radarBlips.length < 5 && enemies.length > 0) radarBlips.push({ id: 'blip' + Date.now(),life: 100});else if (radarBlips.length > 0) radarBlips.shift()} let bHTML = ''; radarBlips.forEach(b => { b.life--; if (b.life <= 0) return; if (!b.x) { b.x = Math.random() * 80 + 10; b.y = Math.random() * 80 + 10} bHTML +=`<div class="radar-blip" style="left:${b.x}%; top:${b.y}%"></div>`}); radarBlipsContainer.innerHTML = bHTML; radarBlips = radarBlips.filter(b => b.life > 0); }
    
+    // NEW: Functions for animating the rotate device screen
+    function initRotateScreen() {
+        rotateScreenCanvas = document.getElementById('rotate-screen-canvas');
+        if (!rotateScreenCanvas) return;
+        rotateScreenCtx = rotateScreenCanvas.getContext('2d');
+        
+        rotateScreenCanvas.width = window.innerWidth;
+        rotateScreenCanvas.height = window.innerHeight;
+
+        rotateScreenStars = [];
+        for (let i = 0; i < ROTATE_STAR_COUNT; i++) {
+            rotateScreenStars.push({
+                x: Math.random() * rotateScreenCanvas.width,
+                y: Math.random() * rotateScreenCanvas.height,
+                radius: Math.random() * 1.5,
+                alpha: 0.5 + Math.random() * 0.5
+            });
+        }
+
+        rotateScreenShootingStars = [];
+        for (let i = 0; i < ROTATE_SHOOTING_STAR_COUNT; i++) {
+            const shootingStar = {
+                reset: function() {
+                    this.x = Math.random() * rotateScreenCanvas.width;
+                    this.y = -20;
+                    this.len = Math.random() * 80 + 10;
+                    this.speed = Math.random() * 8 + 4;
+                    this.alpha = 1;
+                }
+            };
+            shootingStar.reset();
+            rotateScreenShootingStars.push(shootingStar);
+        }
+    }
+
+    function animateRotateScreen() {
+        if(!rotateScreenCtx) return;
+        rotateScreenCtx.clearRect(0, 0, rotateScreenCanvas.width, rotateScreenCanvas.height);
+        
+        rotateScreenCtx.fillStyle = '#FFFFFF';
+        rotateScreenStars.forEach(star => {
+            star.alpha += (Math.random() - 0.5) * 0.05;
+            if (star.alpha > 1) star.alpha = 1;
+            if (star.alpha < 0.2) star.alpha = 0.2;
+            
+            rotateScreenCtx.globalAlpha = star.alpha;
+            rotateScreenCtx.beginPath();
+            rotateScreenCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            rotateScreenCtx.fill();
+        });
+        rotateScreenCtx.globalAlpha = 1;
+
+        rotateScreenShootingStars.forEach(star => {
+            star.x += star.speed;
+            star.y += star.speed;
+
+            if(star.x > rotateScreenCanvas.width + star.len || star.y > rotateScreenCanvas.height + star.len) {
+                star.reset();
+            }
+
+            const gradient = rotateScreenCtx.createLinearGradient(star.x, star.y, star.x - star.len, star.y - star.len);
+            gradient.addColorStop(0, `rgba(255, 255, 255, ${star.alpha})`);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            rotateScreenCtx.strokeStyle = gradient;
+            rotateScreenCtx.lineWidth = 2;
+            rotateScreenCtx.beginPath();
+            rotateScreenCtx.moveTo(star.x, star.y);
+            rotateScreenCtx.lineTo(star.x - star.len, star.y - star.len);
+            rotateScreenCtx.stroke();
+        });
+
+        rotateScreenAnimationId = requestAnimationFrame(animateRotateScreen);
+    }
+   
     const joystickContainer= document.getElementById('joystick-container'), joystickKnob = document.getElementById('joystick-knob');
     let joystickActiveId = null;
     function handleAim(clientX, clientY) {
         if (isGameOver || isPaused || startScreen.style.display === 'flex' || howToPlayScreen.style.display === 'flex' || levelStartScreen.style.display === 'flex') return;
+        joystickTargetPos.active = false; // Mouse movement overrides joystick
         const rect = canvas.getBoundingClientRect();
         
         let relativeX = clientX - rect.left;
@@ -1010,6 +1188,8 @@
 
         crosshairTarget.x = Math.max(minX, Math.min(relativeX, maxX));
         crosshairTarget.y = Math.max(minY, Math.min(relativeY, maxY));
+        crosshairPos.x = crosshairTarget.x; // Mouse is instant, no easing
+        crosshairPos.y = crosshairTarget.y;
     }
     function handleJoystickMove(e) {
         e.preventDefault(); let touch = null;
@@ -1043,10 +1223,15 @@
         if (!touchEnded) return;
        
         joystickActiveId = null;
+        joystickTargetPos.active = false;
         joystickKnob.style.transform = 'translate(0, 0)';
+        
+        // Snap crosshair back to center
         crosshairTarget.x = canvas.width / 2;
         crosshairTarget.y = canvas.height / 2;
-       
+        crosshairPos.x = canvas.width / 2;
+        crosshairPos.y = canvas.height / 2;
+
         window.removeEventListener('touchmove', handleJoystickMove);
         window.removeEventListener('touchend', handleJoystickEnd);
         window.removeEventListener('touchcancel', handleJoystickEnd);
@@ -1054,6 +1239,7 @@
     function handleJoystickStart(e) {
         e.preventDefault();
         if (joystickActiveId === null) {
+            joystickTargetPos.active = true;
             const touch = e.changedTouches[0];
             joystickActiveId = touch.identifier;
             window.addEventListener('touchmove', handleJoystickMove, { passive: false });
@@ -1068,13 +1254,14 @@
         canFire = false;
         const speed = 25;
 
+        // Use the smoothed position for firing
         const startScale = FOCAL_LENGTH / (FOCAL_LENGTH + 0);
-        const startX = (crosshairTarget.x - canvas.width / 2) / startScale + camera.x;
-        const startY = (crosshairTarget.y - canvas.height / 2) / startScale + camera.y;
+        const startX = (crosshairPos.x - canvas.width / 2) / startScale + camera.x;
+        const startY = (crosshairPos.y - canvas.height / 2) / startScale + camera.y;
        
         const endScale = FOCAL_LENGTH / (FOCAL_LENGTH + MAX_DEPTH);
-        const endX = (crosshairTarget.x - canvas.width / 2) / endScale + camera.x;
-        const endY = (crosshairTarget.y - canvas.height / 2) / endScale + camera.y;
+        const endX = (crosshairPos.x - canvas.width / 2) / endScale + camera.x;
+        const endY = (crosshairPos.y - canvas.height / 2) / endScale + camera.y;
        
         const dx = endX - startX;
         const dy = endY - startY;
@@ -1082,24 +1269,35 @@
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
         const vel = { x: (dx / dist) * speed, y: (dy / dist) * speed, z: (dz / dist) * speed };
        
+        let fireRate = 300;
+        let doubleBlasterRate = 150;
+        const novaCutterRate = 100;
+
+        if (currentLevel === 4) { // Survival Mode faster fire rate
+            fireRate = 150;
+            doubleBlasterRate = 75;
+        }
+
         if (player.isNovaCutterActive){
             playSound('shoot_nova');
             projectiles.push(new Projectile(startX, startY, 0, 5, vel, '#FFFFFF', 3));
-            setTimeout(() => { canFire = true; }, 100);
+            setTimeout(() => { canFire = true; }, novaCutterRate);
         } else if (player.isDoubleBlasterActive) {
             playSound('shoot');
             projectiles.push(new Projectile(startX - 20, startY, 0, 3, vel, '#FFA500', 1));
             projectiles.push(new Projectile(startX + 20, startY, 0, 3, vel, '#FFA500', 1));
-            setTimeout(() => { canFire = true; }, 150);
+            setTimeout(() => { canFire = true; }, doubleBlasterRate);
         } else {
             playSound('shoot');
             projectiles.push(new Projectile(startX, startY, 0, 3, vel, '#FFFF00', 1));
-            setTimeout(() => { canFire = true; }, 300);
+            setTimeout(() => { canFire = true; }, fireRate);
         }
     }
 
     function togglePause() {
-        if (isGameOver || startScreen.style.display === 'flex' || howToPlayScreen.style.display === 'flex') return;
+        const isGameRunning = !isGameOver && startScreen.style.display === 'none' && levelStartScreen.style.display === 'none' && howToPlayScreen.style.display === 'none';
+        if (!isGameRunning) return;
+
         isPaused = !isPaused;
         if (isPaused) {
             cancelAnimationFrame(gameLoopId);
@@ -1109,32 +1307,90 @@
             speedIncreaseInterval = null;
             pauseScreen.style.display = 'flex';
             pauseButton.innerHTML = playIcon;
+            animateMenuBackground();
         } else {
+            if(menuLoopId) cancelAnimationFrame(menuLoopId);
+            menuLoopId = null;
             if (!gameLoopId) animate();
             spawnEnemies();
-             speedIncreaseInterval = setInterval(() => {
-                if (!isPaused) dynamicPlayerSpeed += 0.75;
-            }, 15000);
+             if (currentLevel !== 4) {
+                speedIncreaseInterval = setInterval(() => {
+                    if (!isPaused) dynamicPlayerSpeed += 0.75;
+                }, 15000);
+             }
             pauseScreen.style.display = 'none';
             pauseButton.innerHTML = pauseIcon;
         }
     }
 
-    function setCanvasSize() {
-        const r = gameContainer.getBoundingClientRect();
-        if (r.width > 0 && r.height > 0) {
-            canvas.width = r.width;
-            canvas.height = r.height;
-            crosshairTarget.x = canvas.width / 2;
-            crosshairTarget.y = canvas.height / 2;
-            ctx.imageSmoothingEnabled = false;
+    function resizeGame() {
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const aspectRatio = 16 / 10;
+
+        let newWidth, newHeight;
+
+        if (viewportWidth / viewportHeight > aspectRatio) {
+            newHeight = viewportHeight;
+            newWidth = newHeight * aspectRatio;
+        } else {
+            newWidth = viewportWidth;
+            newHeight = newWidth / aspectRatio;
+        }
+
+        gameContainer.style.width = `${newWidth}px`;
+        gameContainer.style.height = `${newHeight}px`;
+
+        setTimeout(() => {
+            const r = gameContainer.getBoundingClientRect();
+            if (r.width > 0 && r.height > 0) {
+                canvas.width = r.width;
+                canvas.height = r.height;
+                if (!joystickTargetPos.active) {
+                    crosshairPos.x = canvas.width / 2;
+                    crosshairPos.y = canvas.height / 2;
+                    crosshairTarget.x = canvas.width / 2;
+                    crosshairTarget.y = canvas.height / 2;
+                }
+                ctx.imageSmoothingEnabled = false;
+            }
+        }, 100);
+    }
+
+    let lastOrientation = window.matchMedia("(orientation: landscape)").matches;
+
+    // MODIFIED: Replaced handleOrientationChange with this more robust version
+    function checkOrientationAndAnimate() {
+        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+        
+        // Pause game if orientation changes mid-game
+        if (isLandscape !== lastOrientation) {
+            lastOrientation = isLandscape;
+            const isGameActive = !isGameOver && !isPaused && startScreen.style.display === 'none' && levelStartScreen.style.display === 'none' && howToPlayScreen.style.display === 'none';
+            if (isGameActive) {
+                togglePause();
+            }
+        }
+        
+        // Control the rotate screen animation
+        if (isTouch && !isLandscape) {
+            if (!rotateScreenAnimationId) {
+                initRotateScreen();
+                animateRotateScreen();
+            }
+        } else {
+            if (rotateScreenAnimationId) {
+                cancelAnimationFrame(rotateScreenAnimationId);
+                rotateScreenAnimationId = null;
+            }
         }
     }
 
     gameContainer.addEventListener('mousemove', (e) => handleAim(e.clientX, e.clientY));
     gameContainer.addEventListener('mousedown', (e) => { if (e.button === 0) fireProjectile(); });
     joystickContainer.addEventListener('touchstart', handleJoystickStart, { passive: false });
-    document.getElementById('fireButton').addEventListener('touchstart', (e) => { e.preventDefault(); fireProjectile(); }, { passive: false});
+    document.getElementById('fireButton').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); fireProjectile(); }, { passive: false});
     window.addEventListener('keydown', (e) => {
         if (e.code === 'Space') { e.preventDefault(); fireProjectile(); }
         if (e.code === 'KeyP') { togglePause(); }
@@ -1147,10 +1403,20 @@
     restartButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); init()});
     levelStartButton.addEventListener('click', startGameLoop);
     mainStartButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); startScreen.style.display = 'none'; showLevelStartScreen()});
-    howToPlayButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); startScreen.style.display = 'none'; howToPlayScreen.style.display = 'flex'; animateMenuBackground(); });
-    backToMenuButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); howToPlayScreen.style.display = 'none'; startScreen.style.display = 'flex'; animateMenuBackground(); });
-    window.addEventListener('resize', setCanvasSize);
-    window.addEventListener('DOMContentLoaded', init);
+    howToPlayButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); startScreen.style.display = 'none'; howToPlayScreen.style.display = 'flex'; animateMenuBackground() });
+    backToMenuButton.addEventListener('click', () => { unlockAudio(); playSound('ui_confirm'); howToPlayScreen.style.display = 'none'; startScreen.style.display = 'flex'; animateMenuBackground() });
+    
+    // MODIFIED: Add/update event listeners
+    window.addEventListener('resize', () => {
+        resizeGame();
+        checkOrientationAndAnimate();
+    });
+    window.addEventListener('orientationchange', checkOrientationAndAnimate);
+    
+    window.addEventListener('DOMContentLoaded', () => {
+        init();
+        checkOrientationAndAnimate(); // Initial check on load
+    });
     </script>
 </body>
 </html>
