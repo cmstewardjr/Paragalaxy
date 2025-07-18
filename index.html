@@ -534,7 +534,7 @@
     let crosshairPos = { x: 0, y: 0 }; // Current position
     let crosshairTarget = { x: 0, y: 0 }; // Target position (from mouse or joystick)
     let joystickTargetPos = { x: 0, y: 0, active: false};
-    const JOYSTICK_EASING = 0.25; // Slower, smoother joystick movement
+    const JOYSTICK_EASING = 0.15; // Slower, smoother joystick movement
 
     let dynamicPlayerSpeed;
     let speedIncreaseInterval = null;
@@ -573,35 +573,47 @@
     const COCKPIT_BORDER_LEFT = 90;
     const COCKPIT_BORDER_RIGHT = 90;
 
-    const levels = [
-        {name:"Space Debris", objective: "Clear the debris field!", e:[
-            { h: 1, r: 80,  p: 50,  d: 1, i: 'debris1', c: '#999999'},
-            { h: 2, r: 120, p: 125, d: 2, i: 'debris2', c: '#999999'},
-            { h: 3, r: 150, p: 200, d: 3, i: 'debris3', c: '#999999'}
-        ]},
-        { name: "Asteroid Field", objective: "Navigate the asteroids!", e:[
-            { h: 2, r: 80,  p: 75,  d: 2, i: 'asteroid1', c: '#808080'},
-            { h: 3, r: 120, p: 150, d: 3, i: 'asteroid2', c: '#808080'},
-            { h: 4, r: 150, p: 250, d: 4, i: 'asteroid3', c: '#808080'}
-        ]},
-        { name: "Enemy Fleet", objective: "Destroy the enemy squadron!", e:[
-            { h: 3, r: 80,  p: 100, d: 3, i: 'ship1', c: '#00FF00'},
-            { h: 4, r: 100, p: 200, d: 4, i: 'ship2', c: '#00BFFF'},
-            { h: 5, r: 140, p: 300, d: 5, i: 'ship3', c: '#FF4500'}
-        ]},
-        { name: "UFO Invasion", objective: "Repel the alien invasion!", e:[
-            { h: 4, r: 90,  p: 150, d: 4, i: 'ufo1', c: '#ADFF2F'},
-            { h: 5, r: 120, p: 250, d: 5, i: 'ufo2', c: '#7FFF00'},
-            { h: 6, r: 160, p: 400, d: 6, i: 'ufo3', c: '#32CD32'}
-        ]},
-        { name: "Survival", objective: "Survive!", e:[
-            { h: 1, r: 80,  p: 50,  d: 1, i: 'debris1', c: '#999999'},
-            { h: 3, r: 120, p: 150, d: 3, i: 'asteroid2', c: '#808080'},
-            { h: 4, r: 100, p: 200, d: 4, i: 'ship2', c: '#00BFFF'},
-            { h: 5, r: 140, p: 300, d: 5, i: 'ship3', c: '#FF4500'},
-            { h: 6, r: 160, p: 400, d: 6, i: 'ufo3', c: '#32CD32'}
-        ]}
-    ];
+   const levels = [
+    // LEVEL 1: Should only have Debris
+    {name:"Space Debris", objective: "Clear the debris field!", e:[
+        { h: 1, r: 80,  p: 40,  d: 1, i: 'debris1', c: '#999999'},
+        { h: 2, r: 120, p: 125, d: 2, i: 'debris2', c: '#999999'},
+        { h: 3, r: 150, p: 200, d: 3, i: 'debris3', c: '#999999'}
+    ]},
+    // LEVEL 2: Should only have Asteroids
+    { name: "Asteroid Field", objective: "Navigate the asteroids!", e:[
+        { h: 2, r: 80,  p: 40,  d: 2, i: 'asteroid1', c: '#808080'},
+        { h: 3, r: 120, p: 130, d: 3, i: 'asteroid2', c: '#808080'},
+        { h: 4, r: 150, p: 250, d: 4, i: 'asteroid3', c: '#808080'}
+    ]},
+    // LEVEL 3: Should only have Ships
+    { name: "Enemy Fleet", objective: "Destroy the enemy squadron!", e:[
+        { h: 3, r: 80,  p: 135, d: 3, i: 'ship1', c: '#00FF00'},
+        { h: 4, r: 100, p: 200, d: 4, i: 'ship2', c: '#00BFFF'},
+        { h: 5, r: 140, p: 300, d: 5, i: 'ship3', c: '#FF4500'}
+    ]},
+    // LEVEL 4: Should only have UFOs
+    { name: "UFO Invasion", objective: "Repel the alien invasion!", e:[
+        { h: 4, r: 90,  p: 150, d: 4, i: 'ufo1', c: '#ADFF2F'},
+        { h: 5, r: 120, p: 250, d: 5, i: 'ufo2', c: '#7FFF00'},
+        { h: 6, r: 160, p: 400, d: 6, i: 'ufo3', c: '#32CD32'}
+    ]},
+    // LEVEL 5: The mixed "Survival" level
+    { name: "Survival", objective: "Survive as long as you can!", e:[
+        { h: 1, r: 80,  p: 50,  d: 1, i: 'debris1', c: '#999999'},
+        { h: 2, r: 80,  p: 40,  d: 2, i: 'asteroid1', c: '#808080'},
+        { h: 3, r: 80,  p: 135, d: 3, i: 'ship1', c: '#00FF00'},
+        { h: 4, r: 150, p: 250, d: 4, i: 'asteroid3', c: '#808080'}
+        { h: 3, r: 120, p: 150, d: 3, i: 'asteroid2', c: '#808080'},
+        { h: 4, r: 90,  p: 150, d: 4, i: 'ufo1', c: '#ADFF2F'},
+        { h: 5, r: 120, p: 250, d: 5, i: 'ufo2', c: '#7FFF00'},
+        { h: 4, r: 100, p: 200, d: 4, i: 'ship2', c: '#00BFFF'},
+        { h: 5, r: 140, p: 300, d: 5, i: 'ship3', c: '#FF4500'},
+        { h: 6, r: 160, p: 400, d: 6, i: 'ufo3', c: '#32CD32'},
+        { h: 2, r: 120, p: 125, d: 2, i: 'debris2', c: '#999999'},
+        { h: 3, r: 150, p: 200, d: 3, i: 'debris3', c: '#999999'}
+    ]}
+];
 
     function getHighScore() { return parseInt(localStorage.getItem('paragalaxyHighScore') || '0', 10); }
     function setHighScore(newScore) { localStorage.setItem('paragalaxyHighScore', newScore); }
